@@ -1,0 +1,20 @@
+-- ROS Package
+roscpp
+rospy
+rosserial_python
+tf2
+tf2_ros
+nav_msgs
+sensor_msgs
+geometry_msgs
+std_msgs
+gmapping
+map_server
+move_base
+amcl
+
+-- Could not find
+lino_msgs
+imu-filter-madwick
+imu-calib
+linio_pid
