@@ -1,15 +1,24 @@
 <img src="https://raw.githubusercontent.com/linorobot/lino_docs/master/imgs/wiki/logo1.png" width="200" height="200" />
 
-# linorobot [![Build Status](https://travis-ci.org/linorobot/lino_install.svg?branch=master)](https://travis-ci.org/linorobot/lino_install)
+# linorobot
 Linorobot is a suite of Open Source ROS compatible robots that aims to provide students, developers, and researchers a low-cost platform in creating new exciting applications on top of ROS.
+
+This guide has been adapted from the original [Linorobot repo](https://github.com/linorobot/linorobot) to support ROS Noetic on a Raspberry Pi 4. The files have also been updated to support the configuration in the next section by default.
+
+## Tested Configuration
+- Raspberry Pi 4 Model B running Ubuntu Mate 20.04.
+- 2WD robot base
+- RPLidar
+- MPU6050
+- L298 Motor Driver
 
 ## Tutorial
 
-You can read the full tutorial how to build your robot [here](https://github.com/grassjelly/linorobot/wiki/1.-Getting-Started).
+Apart from sections 1.2 and 1.3, you can follow the full tutorial how to build your robot [here (Original Guide)](https://github.com/grassjelly/linorobot/wiki/1.-Getting-Started). 
 
 ## Multiplatform
 Supports multiple types of robot base:
-- 2WD
+- 2WD (updated for ROS Noetic)
 - 4WD
 - Ackermann Steering 
 - Mecanum drive
@@ -19,6 +28,7 @@ Supports multiple types of robot base:
 Works on:
 - ROS Indigo (Ubuntu 14.04)
 - ROS Kinetic (Ubuntu 16.04)
+- ROS Noetic (Ubuntu 20.04 - *only for 2WD with RPLidar*)
 
 ## Hardware
 Fabricate your own Teensy 3.1/3.2 [shield,](https://github.com/linorobot/lino_docs/tree/master/schematics)
@@ -26,10 +36,10 @@ Fabricate your own Teensy 3.1/3.2 [shield,](https://github.com/linorobot/lino_do
 ![alt text](https://github.com/linorobot/lino_docs/blob/master/imgs/readme/shield.JPG?raw=true)![alt text](https://github.com/linorobot/lino_docs/blob/master/imgs/readme/shield2.JPG?raw=true)
 
 or wire it on your own. Wiring diagrams are also provided.
+
 [![alt text](https://github.com/linorobot/lino_docs/blob/master/imgs/readme/schematicsfamilyphoto.png?raw=true)](https://github.com/linorobot/linorobot/wiki/2.-Base-Controller)
 
 #### Supported IMUs:
-
 - GY-85
 - MPU6050
 - MPU9150
@@ -44,26 +54,33 @@ The IMU drivers are based on [i2cdevlib](https://github.com/jrowberg/i2cdevlib).
 
 #### Supported ROS Compatible Sensors:
 - XV11 Lidar
-- RPLidar
+- RPLidar (updated for ROS Noetic)
 - YDLIDAR X4
 - Hokuyo (SCIP 2.2 Compliant)
 - Intel RealSense R200
 - Kinect
 
-#### Tested on Linux compatible ARM dev boards:    
+#### Tested on Linux compatible ARM dev boards:
+- Raspberry Pi 4 (*only for 2WD with RPLidar*)    
 - Raspberry Pi 3/B+   
 - Jetson TK1   
 - Jetson TX1   
 - Odroid XU4   
 - Radxa Rock Pro   
-**Technically this should also work with any ARM dev board at least (1GB RAM) that runs Ubuntu Trusty or Xenial.
+**Technically this should also work with any ARM dev board at least (1GB RAM) that runs Ubuntu Trusty or Xenial (or Focal - 2WD with RPLidar only).
 
 ## Installation
 ![alt text](https://github.com/linorobot/lino_docs/blob/master/imgs/readme/installationshot.png?raw=true)
 
 ```
-git clone https://github.com/linorobot/lino_install && cd lino_install
+git clone https://github.com/iangohy/lino_install.git && cd lino_install
 ./install <base> <sensor>
+```
+
+Example
+```
+git clone https://github.com/iangohy/lino_install.git && cd lino_install
+./install 2wd rplidar
 ```
 
 ## Firmware
@@ -83,10 +100,14 @@ linorobot_ws/teensy/firmware/lib/config/lino_base_config.h
 #### IMU configuration:
 ```
 //uncomment the IMU you're using
-#define USE_GY85_IMU
-// #define USE_MP6050_IMU
+// #define USE_GY85_IMU
+#define USE_MPU6050_IMU
 // #define USE_MPU9150_IMU
 // #define USE_MPU9250_IMU
+```
+If you are not MPU6050 IMU, remember to set use_mag param on imu_madgwick_filter to true since it has a magnetometer. Open `linorobot/launch/include/imu` and change the second parameter to `true`.
+```
+<param name="use_mag" value="true" />
 ```
 
 #### Motor driver configuration:
@@ -100,12 +121,12 @@ linorobot_ws/teensy/firmware/lib/config/lino_base_config.h
 #### Motor configuration:
 ```
 //define your robot' specs here
-#define MAX_RPM 330               // motor's maximum RPM
-#define COUNTS_PER_REV 1550       // wheel encoder's no of ticks per rev
-#define WHEEL_DIAMETER 0.10       // wheel's diameter in meters
+#define MAX_RPM 100               // motor's maximum RPM
+#define COUNTS_PER_REV 2830       // wheel encoder's no of ticks per rev
+#define WHEEL_DIAMETER 0.065       // wheel's diameter in meters
 #define PWM_BITS 8                // PWM Resolution of the microcontroller
-#define LR_WHEELS_DISTANCE 0.235  // distance between left and right wheels
-#define FR_WHEELS_DISTANCE 0.30   // distance between front and rear wheels
+#define LR_WHEELS_DISTANCE 0.14  // distance between left and right wheels
+#define FR_WHEELS_DISTANCE 0.30   // distance between front and rear wheels. Ignore this if you're on 2WD/ACKERMANN
 #define MAX_STEERING_ANGLE 0.415  // max steering angle. This only applies to Ackermann steering
 
 ```
